@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>اختبار القدرات | أ/ عبدالعزيز الفيفي</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .quiz-container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 1rem; text-align: center; }
+        button { background: #0284c7; color: white; border: none; padding: 12px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="login-page">
+        <h2>مرحباً بك في الاختبار</h2>
+        <p>يرجى إدخال اسمك الثلاثي للبدء</p>
+        <input type="text" id="student-name" placeholder="اكتب اسمك هنا..." required>
+        <br><br>
+        <button onclick="startQuiz()">ابدأ الاختبار الآن</button>
+    </div>
+
+    <div id="quiz-page" class="hidden">
+        <h3 id="question-text">جاري تحميل الأسئلة...</h3>
+        <div id="options"></div>
+    </div>
+
+    <div id="result-page" class="hidden">
+        <h2>تم إرسال نتيجتك بنجاح</h2>
+        <p id="final-score"></p>
+    </div>
+</div>
+
+<script>
+    // إعدادات Firebase الخاصة بك
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkCO7FDQXd89YDf843J4_AtvEFvzzt-R0",
+        authDomain: "aztlg-494c3.firebaseapp.com",
+        projectId: "aztlg-494c3",
+        storageBucket: "aztlg-494c3.firebasestorage.app",
+        messagingSenderId: "597051893949",
+        appId: "1:597051893949:web:de5554ac900317a92b2fd4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let currentName = "";
+    let score = 0;
+
+    function startQuiz() {
+        currentName = document.getElementById('student-name').value;
+        if (currentName.length < 3) {
+            alert("يرجى كتابة الاسم بشكل صحيح");
+            return;
+        }
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('quiz-page').classList.remove('hidden');
+        // هنا تضع دالة تحميل الأسئلة الخاصة بك
+        loadQuestion();
+    }
+
+    // دالة إرسال النتيجة (هنا تم إصلاح المشكلة)
+    async function submitResult() {
+        try {
+            await db.collection("student_results").add({
+                name: currentName, // نرسل الاسم فقط، بدون دمج أي فصول أو إيميلات
+                score: score,
+                total: 10, // عدله حسب عدد أسئلتك
+                model_id: "15", // رقم النموذج
+                time: firebase.firestore.FieldValue.serverTimestamp(),
+                // مصفوفة المهارات (مثال)
+                sections: { tan: 100, ekm: 90, syq: 85, st: 95, mfr: 80, art: 100, ikh: 90 }
+            });
+            
+            document.getElementById('quiz-page').classList.add('hidden');
+            document.getElementById('result-page').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `درجتك هي: ${score}`;
+        } catch (error) {
+            console.error("خطأ في الإرسال: ", error);
+        }
+    }
+
+    function loadQuestion() {
+        // كود الأسئلة الخاص بك يوضع هنا
+        // عند الانتهاء من الأسئلة استدعِ دالة submitResult()
+    }
+</script>
+</body>
+</html>
+
